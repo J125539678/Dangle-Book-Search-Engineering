@@ -1,0 +1,60 @@
+$def with()
+<html>
+<head>
+    <style type="text/css">
+        div.container
+        {
+        margin-top: 10%;
+        margin-left:18%;
+        }
+        label.choosed
+        {
+        text-decoration:none;
+        color:#dfe2dc;
+        font-size:30px;
+        margin-left:30%;
+        }
+        .searchbox
+        {
+        width: 80%;
+        height: 43px;
+        padding: 10px 15px;
+        font-size: 15px;
+        line-height: 1.428571429;
+        color: #2c3e50;
+        vertical-align: middle;
+        border: 1px solid #dce4ec;
+        border-radius: 4px;
+        }
+        .searchbutton
+        {
+        margin-top:3%;
+        margin-left:29%;
+        width:19%;
+        padding: 8px 15px;
+        font-size: 20px;
+        background-color:transparent;
+        font-weight: normal;
+        color:white;
+        line-height: 1.428571429;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 4px;
+        }
+    </style>
+</head>
+<body style="background:url(static/sky.jpg);">
+    <div class="container">
+        <span style="color:#dfe2dc;font-size:100px;margin-left:23%">Danggle</span><br>
+        <label href="/"  class="choosed">Text</label>
+        <a href="/im" style="text-decoration:none;color:#778899;font-size:30px;">Image</a>
+        <form action="/s/start=0" method="GET">
+            <input type="text" name="wd" maxlength="100" class="searchbox" />
+            <input type="submit" name="search" value="search" class="searchbutton" />
+        </form>
+    </div>
+</body>
+</html>

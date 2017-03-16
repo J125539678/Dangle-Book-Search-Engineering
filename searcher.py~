@@ -1,0 +1,84 @@
+# -*- coding:gbk -*-
+#!/usr/bin/python
+import web
+from web import form
+import IndexFiles, SearchFiles, IndexImgs, SearchImgs, lucene, sys, os
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+urls = (
+    '/', 'index',
+    '/im', 'index_img',
+    '/s/start=(\d+)', 'text',
+    '/i', 'image',
+)
+render = web.template.render('templates') # your templates
+
+def func(command):
+    STORE_DIR = "index"
+    vm_env = lucene.getVMEnv()
+    vm_env.attachCurrentThread()  # 新建线程
+    return SearchFiles.search(STORE_DIR, command)  # 查找索引
+
+def func_img(command):
+    STORE_DIR = "img_index"
+    vm_env = lucene.getVMEnv()
+    vm_env.attachCurrentThread()
+    return SearchImgs.search(STORE_DIR, command)
+
+class index:
+    def GET(self):
+        return render.index_web()
+
+class index_img:
+    def GET(self):
+        return render.index_img()
+
+class text:
+    result = []
+    last_user_data = {}
+    def GET(self,start):
+        start = int(start)
+        user_data = web.input()
+        if user_data.get('wd'):   #判断是否需要搜索关键词
+            text.last_user_data=user_data
+            text.result = func(user_data['wd'])
+        elif len(text.last_user_data)>0:
+            user_data = text.last_user_data
+        else:
+            return render.index_web()
+        result_len = len(text.result)/3
+        print result_len, start
+        return render.result_web(user_data['wd'], text.result[start*3:3*min(start+10,result_len)],\
+                                 result_len, start)
+
+class image:
+    def GET(self):
+        user_data = web.input()
+        if len(user_data)==0 or user_data['wd'] == '':return render.index_img()
+        result = func_img(user_data['wd'])
+        return render.result_img(user_data['wd'], result)
+
+def fileIndexer():
+    try:
+       # IndexFiles.begin_crawl('http://tieba.baidu.com/f?kw=%E6%B5%B7%E8%B4%BC%E7%8E%8B', 300, 10)
+        IndexFiles.IndexFiles('html', "index", lucene.WhitespaceAnalyzer(lucene.Version.LUCENE_CURRENT))
+    except Exception, e:
+        print "Failed in:", e
+
+def imgIndexer():
+    print 'lucene', lucene.VERSION
+    try:
+        IndexImgs.begin_crawl('http://category.dangdang.com/cid4002742.html', 100, 10)
+        IndexImgs.IndexFiles('html_imgs', "img_index", lucene.WhitespaceAnalyzer(lucene.Version.LUCENE_CURRENT))
+    except Exception, e:
+        print "Failed: ", e
+
+if __name__ == "__main__":
+    vm_env = lucene.initVM()
+
+    fileIndexer()  # 构建网页索引
+    #imgIndexer()    # 构建图片索引
+    app = web.application(urls, globals())
+    app.run()

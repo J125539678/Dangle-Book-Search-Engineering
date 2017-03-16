@@ -1,0 +1,111 @@
+$def with()
+
+<html>
+<head>
+    <script>
+function change() {
+        var pic = document.getElementById("preview");
+        var file = document.getElementById("mypic");
+		var ext=file.value.substring(file.value.lastIndexOf(".")+1).toLowerCase();
+		if(ext!='png'&&ext!='jpg'&&ext!='jpeg'){
+			alert("请选择合法图片!");
+			return;
+		}
+        if (document.all) {
+
+            file.select();
+            var reallocalpath = document.selection.createRange().text;
+			var ie6 = /msie 6/i.test(navigator.userAgent);
+            if (ie6) pic.src = reallocalpath;
+            else {
+                pic.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='image',src=\"" + reallocalpath + "\")";
+                pic.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+            }
+        }else{
+    		html5Reader(file);
+		}
+    }
+
+	function html5Reader(file){
+		var file = file.files[0];
+		var reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function(e){
+			var pic = document.getElementById("preview");
+			pic.src=this.result;
+		}
+	}
+    </script>
+    <style type="text/css">
+        label.choosed
+        {
+        text-decoration:none;
+        color:#dfe2dc;
+        font-size:30px;
+        }
+        .searchbox
+        {
+        width: 80%;
+        height: 43px;
+        padding: 10px 15px;
+        font-size: 15px;
+        line-height: 1.428571429;
+        color: #2c3e50;
+        vertical-align: middle;
+        border: 1px solid #dce4ec;
+        border-radius: 4px;
+        }
+        .searchbutton
+        {
+        margin-top:3%;
+        margin-left:29%;
+        width:19%;
+        padding: 8px 15px;
+        font-size: 20px;
+        background-color:transparent;
+        font-weight: normal;
+        color:white;
+        line-height: 1.428571429;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 4px;
+        }
+        .filebutton
+        {
+        margin-top:3%;
+        margin-left:29%;
+        width:19%;
+        padding: 8px 15px;
+        font-size: 8px;
+        background-color:transparent;
+        font-weight: normal;
+        color:white;
+        line-height: 1.428571429;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid white;
+        border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body style="background:url(static/sky.jpg)">
+    <div style="margin-top: 10%;margin-left:18%">
+        <span style="color:#dfe2dc;font-size:80px;margin-left:23%">Danggle</span><br>
+        <a href="/"  style="text-decoration:none;color:#778899;font-size:30px;margin-left:30%">Text</a>
+        <label class="choosed">Image</label>
+        <form enctype="multipart/form-data" action="/i/start=0" method="POST"  name="form1">
+            <input type="text" name="wd" maxlength="100" placeholder="输入图片网址" class="searchbox" /><br>
+            <input id="mypic" type="file" name="mypic" class="filebutton" onchange="change()" ><br><br>
+            <img id="preview" alt="" name="pic" style="max-width:160px;max-height:160px;margin-left:29%"/><br>
+            <input type="submit" name="search" value="search" class="searchbutton" />
+        </form>
+
+    </div>
+</body>
+</html>

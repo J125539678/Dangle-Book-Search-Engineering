@@ -1,0 +1,159 @@
+$def with (command,picname,result,result_len,start)
+    $ commands = command.split()
+
+<head>
+    <style type="text/css">
+        div.Content
+        {
+            <!-- for an item-->
+            border-left:1px solid #a5e2e4;
+            padding:1em;
+            background-color:#e7f4ee;
+            margin-left:120px;
+            margin-right:20%;
+            margin-top:1%;
+            margin-bottom:1%;
+            height:200px;
+        }
+        div.searchbar
+        {
+        margin-top:-6px;
+        padding: 8px 8px;
+        background-color:#f5f5f5;
+        height:50px;
+        width:99%;
+        border: 0.5px solid #b9b1c1;
+        }
+        div.choosebar
+        {
+        background-color:#ffffff;
+        height:50px;
+        width:100%;
+        border: 1px solid #fffaf0;
+        vertical-align:middle;
+        font-size:30px;
+        }
+        .searchbox
+        {
+        width: 50%;
+        height: 43px;
+        padding: 10px 15px;
+        font-size: 15px;
+        line-height: 1.428571429;
+        color: #2c3e50;
+        vertical-align: middle;
+        border: 1px solid #dce4ec;
+        }
+        .searchbutton
+        {
+        height: 43px;
+        width: 100px;
+        padding: 8px 15px;
+        font-size: 20px;
+        background-color:#76cdf4;
+        color: #ffffff
+        font-weight: normal;
+        line-height: 1.428571429;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid transparent;
+        }
+        .page_link
+        {
+        text-decoration:none;
+        color:#0062b2;
+        }
+        .footbar
+        {
+        height:40px;
+        margin-top:20px;
+        margin-left:-6px;
+        text-align:center;
+        vertical-align:center;
+        font-size:30px;
+        color:#ececee;
+        width:101%;
+        background:url(../static/footbar.jpg);
+        }
+    </style>
+</head>
+<body>
+    <div class="searchbar">
+        <form action="/s/start=0" method="GET">
+            <strong style="color:#13acf1;font-size:180%;">Danggle</strong>
+            <input type="text" name="wd" maxlength="100" value="$command" class="searchbox"
+            /><input type="submit" name="search" value="search" class="searchbutton" />
+        </form>
+    </div>
+    <div class="choosebar">
+        <a href="/s/start=0" style="text-decoration:none;color:#778899;margin-left:120px">Text</a>
+        <span style="color:#76cdf4;">Image</span>
+    </div>
+    $if command != '':
+        $ cur_page=start/10+1
+        <small style="color: #999ea3;margin-left:120px;">Find about $result_len results for: "$command"</small>
+    $else:
+        <small style="color: #999ea3;margin-left:120px;">Find about $result_len results for: </small><br>
+        <img src="../static/searchpic/$picname" style="max-width:140px;max-height:140px;margin-left:120px" />
+    <hr style="margin-left:120px">
+    $for i in range(len(result)):
+         <div class="Content">
+             <a href="$result[i][0]">$result[i][1]</a><br><br>
+             <div style="float:left">
+             <a href="$result[i][2]"><img src="$result[i][2]" style="max-width:120px;max-height:120px" /></a>
+             </div>
+             <div >
+                 Title:
+                 $if len(command) > 0:
+                     $ pos=0
+                     $ last_pos = 0
+                     $ text = result[i][1]
+                     $ str_len = len(text)
+                     $while pos < str_len:
+                         $ pos = str_len
+                         $ c_len = 0
+                         $for c in commands:
+                             $ p = text.find(c, last_pos, str_len-1)
+                             $if p == -1 or p > pos:
+                                 $continue
+                             $else:
+                                 $ pos = p
+                             $ c_len = len(c)
+                         $text[last_pos:pos]
+                         $if pos == str_len:
+                             $break
+                         $if c_len > 0:
+                             <label style="color:red">$text[pos:pos+c_len]</label>
+                         $ last_pos = pos+c_len
+                    $else:
+                         $result[i][1]
+                 <br><br>
+                 Price: $result[i][3]
+                 <br><br>
+                 <span style="color:rgb(14,91,28)">$result[i][0]</span>
+             </div>
+         </div>
+    <hr style="margin-left:120px">
+    <div style="margin-left:120px;">
+        $ cur_page=start/10+1
+        $ first_page=max(1,cur_page-5)
+        $ last_page=min(first_page+9,(result_len-1)/10+1)
+        $ first_page=max(1,last_page-9)
+        $ pre_page = start-10
+        $ next_page = start+10
+        $ previous_url = "/s/start="+"%i"%pre_page
+        $ next_url = "/s/start="+"%i"%next_page
+        <a href='$previous_url' class="page_link">previous</a>
+        $for page in range(first_page,last_page+1):
+            $if page != cur_page:
+                $ start = (page-1)*10
+                $ cur_url = "/s/start="+"%i"%start
+                <a href="$cur_url" class="page_link">$page</a>
+            $else:
+                <label>$page</label>
+        <a href="$next_url" class="page_link">next</a>
+    </div>
+    <div class="footbar">Author:Zhong Wencai</div>
+</body>
